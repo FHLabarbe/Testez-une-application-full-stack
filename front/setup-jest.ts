@@ -16,6 +16,9 @@ Object.defineProperty(window, 'sessionStorage', { value: mock() });
 Object.defineProperty(window, 'getComputedStyle', {
   value: () => ['-webkit-appearance'],
 });
+Object.defineProperty(globalThis.Element.prototype, 'animate', {
+  value: jest.fn(),
+});
 
 Object.defineProperty(document.body.style, 'transform', {
   value: () => {
