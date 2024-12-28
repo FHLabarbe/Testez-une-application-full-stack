@@ -89,15 +89,12 @@ class TeacherServiceTest {
     }
 
     @Test
-    public void shouldThrowNotFoundExceptionWhenTeacherDoesNotExist() {
+    public void shouldReturnNullWhenTeacherDoesNotExist() {
         Long teacherId = 1L;
         when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
-        try {
-            teacherService.findById(teacherId);
-            fail("Expected NotFoundException to be thrown");
-        } catch (NotFoundException e) {
-            assertThat(e).isInstanceOf(NotFoundException.class);
-        }
-    verify(teacherRepository, times(1)).findById(teacherId);
+        Teacher result = teacherService.findById(teacherId);
+        assertThat(result).isNull();
+        verify(teacherRepository, times(1)).findById(teacherId);
     }
+
 }
