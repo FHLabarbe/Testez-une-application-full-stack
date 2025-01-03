@@ -38,15 +38,6 @@ class AuthControllerTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private UserDetailsServiceImpl userDetailsService;
-
-    @MockBean
-    private JwtUtils jwtUtils;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
-
     @Test
     void shouldReturnUnauthorizedWhenLoginFails() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
