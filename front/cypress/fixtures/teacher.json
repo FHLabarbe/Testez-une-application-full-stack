@@ -1,0 +1,7 @@
+{
+  "id": 1,
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "createdAt": "2025-01-01T08:00:00Z",
+  "updatedAt": "2025-01-02T08:00:00Z"
+}

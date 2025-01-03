@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "name": "Yoga Basics",
+  "description": "An introduction to yoga for beginners.",
+  "date": "2025-01-15T10:00:00Z",
+  "teacher_id": 1,
+  "users": [1, 2, 3],
+  "createdAt": "2025-01-01T08:00:00Z",
+  "updatedAt": "2025-01-10T08:00:00Z"
+}

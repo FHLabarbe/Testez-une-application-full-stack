@@ -18,12 +18,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 class AuthControllerTest {
 
     @Autowired
@@ -43,15 +45,15 @@ class AuthControllerTest {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("wrong@example.com");
         loginRequest.setPassword("wrongpassword");
-
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new RuntimeException("Bad credentials"));
+            .thenThrow(new BadCredentialsException("Bad credentials"));
 
         mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isUnauthorized());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isUnauthorized());
     }
+
 
     @Test
     void shouldReturnBadRequestWhenFieldsAreMissingInLogin() throws Exception {

@@ -1,0 +1,8 @@
+{
+  "id": 2,
+  "email": "admin@example.com",
+  "firstName": "Admin",
+  "lastName": "Admin",
+  "admin": true,
+  "token": "fake-jwt-admin-token"
+}

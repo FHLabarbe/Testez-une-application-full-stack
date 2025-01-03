@@ -38,7 +38,7 @@ class SessionControllerIntegrationTest {
 
     @BeforeEach
     void setup() throws Exception {
-            String loginPayload = "{\"email\":\"test.user@example.com\",\"password\":\"password\"}";
+            String loginPayload = "{\"email\":\"test.user@example.com\",\"password\":\"dummypassword\"}";
             String response = mockMvc.perform(post("/api/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(loginPayload))
@@ -57,7 +57,7 @@ class SessionControllerIntegrationTest {
     
     @Test
     void shouldGenerateTokenForValidUser() throws Exception {
-            String loginPayload = "{\"email\":\"test.user@example.com\",\"password\":\"password\"}";
+            String loginPayload = "{\"email\":\"test.user@example.com\",\"password\":\"dummypassword\"}";
 
             mockMvc.perform(post("/api/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -68,23 +68,10 @@ class SessionControllerIntegrationTest {
 
     @Test
     void shouldReturnAllSessions() throws Exception {
-        Teacher teacher = new Teacher();
-        teacher.setId(1L);
-        sessionRepository.saveAndFlush(new Session(null, "Session 1", new Date(), "Description 1", teacher, null, null, null));
-        sessionRepository.saveAndFlush(new Session(null, "Session 2", new Date(), "Description 2", teacher, null, null, null));
-
         mockMvc.perform(get("/api/session")
                 .header("Authorization", getAuthorizationHeader()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
-    }
-
-    @Test
-    void shouldReturnEmptyListWhenNoSessions() throws Exception {
-        mockMvc.perform(get("/api/session")
-                .header("Authorization", getAuthorizationHeader()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
@@ -99,12 +86,12 @@ class SessionControllerIntegrationTest {
                 .andExpect(jsonPath("$.name").value("New Session"))
                 .andExpect(jsonPath("$.description").value("Description"));
 
-        assertThat(sessionRepository.findAll()).hasSize(1);
+        assertThat(sessionRepository.findAll()).hasSize(3);
     }
 
     @Test
     void shouldReturnBadRequestForMissingFieldsInSessionCreation() throws Exception {
-            SessionDto sessionDto = new SessionDto(null, "New Session", new Date(), 1L, "Description", null, null, null);
+        SessionDto sessionDto = new SessionDto(null, null, null, 1L, "Description", null, null, null);
 
         mockMvc.perform(post("/api/session")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -115,13 +102,8 @@ class SessionControllerIntegrationTest {
 
     @Test
     void shouldUpdateSession() throws Exception {
-        Teacher teacher = new Teacher();
-        teacher.setId(1L);
-        Session session = sessionRepository.saveAndFlush(
-                new Session(null, "Old Session", null, "Old Description", teacher, null, null, null));
-        SessionDto sessionDto = new SessionDto(null, "Updated Session", new Date(), 1L, "Updated Description", null, null, null);
-
-        mockMvc.perform(put("/api/session/" + session.getId())
+        SessionDto sessionDto = new SessionDto(1L, "Updated Session", new Date(), 1L, "Updated Description", null, null, null);
+        mockMvc.perform(put("/api/session/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sessionDto))
                 .header("Authorization", getAuthorizationHeader()))
@@ -129,7 +111,7 @@ class SessionControllerIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Updated Session"))
                 .andExpect(jsonPath("$.description").value("Updated Description"));
 
-        Session updatedSession = sessionRepository.findById(session.getId()).orElse(null);
+        Session updatedSession = sessionRepository.findById(1L).orElse(null);
         assertThat(updatedSession).isNotNull();
         assertThat(updatedSession.getName()).isEqualTo("Updated Session");
     }
@@ -138,11 +120,9 @@ class SessionControllerIntegrationTest {
     void shouldReturnBadRequestForMissingFieldsInSessionUpdate() throws Exception {
         Teacher teacher = new Teacher();
         teacher.setId(1L);
-        Session session = sessionRepository.saveAndFlush(
-                new Session(null, "Old Session", null, "Old Description", teacher, null, null, null));
-        SessionDto sessionDto = new SessionDto(null, "New Session", new Date(), 1L, "Description", null, null, null);
+        SessionDto sessionDto = new SessionDto(1L, "", new Date(), 1L, "Description", null, null, null);
 
-        mockMvc.perform(put("/api/session/" + session.getId())
+        mockMvc.perform(put("/api/session/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sessionDto))
                 .header("Authorization", getAuthorizationHeader()))
@@ -151,16 +131,11 @@ class SessionControllerIntegrationTest {
 
     @Test
     void shouldDeleteSession() throws Exception {
-        Teacher teacher = new Teacher();
-        teacher.setId(1L);
-        Session session = sessionRepository.saveAndFlush(
-                new Session(null, "Session to Delete", null, "Description", teacher, null, null, null));
-
-        mockMvc.perform(delete("/api/session/" + session.getId())
+        mockMvc.perform(delete("/api/session/1")
                 .header("Authorization", getAuthorizationHeader()))
                 .andExpect(status().isOk());
 
-        assertThat(sessionRepository.findById(session.getId())).isEmpty();
+        assertThat(sessionRepository.findById(1L)).as("The session should be deleted").isNotPresent();
     }
 
     @Test

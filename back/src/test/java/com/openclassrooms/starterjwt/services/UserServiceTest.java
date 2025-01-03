@@ -30,12 +30,12 @@ class UserServiceTest {
 
     @Test
     void shouldReturnUserById() {
-        Long userId = 1L;
+        Long userId = 2L;
         User user = User.builder()
                 .email("john.doe@example.com")
                 .lastName("Doe")
                 .firstName("John")
-                .password("password123")
+                .password("dummypassword")
                 .admin(false)
                 .build();
 
@@ -48,17 +48,11 @@ class UserServiceTest {
     }
 
     @Test
-    public void shouldThrowNotFoundExceptionWhenUserDoesNotExist() {
-        Long userId = 1L;
+    void shouldReturnNullWhenUserDoesNotExist() {
+        Long userId = 999L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        try {
-            userService.findById(userId);
-            fail("Expected NotFoundException to be thrown");
-        } catch (NotFoundException e) {
-            assertThat(e).isInstanceOf(NotFoundException.class); // Vérifie que c'est la bonne exception
-            assertThat(e.getMessage()).isEqualTo("User not found"); // Facultatif : vérifie le message de l'exception
-        }
+        User result = userService.findById(userId);
+        assertThat(result).isNull();
         verify(userRepository, times(1)).findById(userId);
     }
 

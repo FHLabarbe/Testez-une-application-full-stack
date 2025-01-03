@@ -1,7 +1,9 @@
 package com.openclassrooms.starterjwt.services;
 
 import com.openclassrooms.starterjwt.exception.BadRequestException;
+import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.models.Session;
+import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -127,5 +130,74 @@ class SessionServiceTest {
         assertThat(result).isNull();
         verify(sessionRepository, times(1)).findById(sessionId);
     }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenSessionNotFoundInParticipate() {
+        Long sessionId = 10L;
+        Long userId = 100L;
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+
+        assertThrows(NotFoundException.class, () -> sessionService.participate(sessionId, userId));
+        verify(sessionRepository, times(1)).findById(sessionId);
+        verify(userRepository, times(1)).findById(userId);
+        verifyNoMoreInteractions(sessionRepository, userRepository);
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenUserNotFoundInParticipate() {
+        Long sessionId = 10L;
+        Long userId = 100L;
+        Session session = new Session();
+        session.setUsers(new ArrayList<>()); 
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> sessionService.participate(sessionId, userId));
+        verify(sessionRepository, times(1)).findById(sessionId);
+        verify(userRepository, times(1)).findById(userId);
+        verifyNoMoreInteractions(sessionRepository, userRepository);
+    }
+
+    @Test
+    void shouldThrowBadRequestExceptionWhenUserAlreadyParticipates() {
+        Long sessionId = 10L;
+        Long userId = 100L;
+        User user = new User();
+        user.setId(userId);
+        Session session = new Session();
+        session.setUsers(new ArrayList<>(List.of(user)));
+
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // WHEN & THEN
+        assertThrows(BadRequestException.class, () -> sessionService.participate(sessionId, userId));
+        verify(sessionRepository, times(1)).findById(sessionId);
+        verify(userRepository, times(1)).findById(userId);
+        verifyNoMoreInteractions(sessionRepository, userRepository);
+    }   
+
+    @Test
+    void shouldAddUserWhenParticipateIsCalledWithValidData() {
+        // GIVEN
+        Long sessionId = 10L;
+        Long userId = 100L;
+        User user = new User();
+        user.setId(userId);
+        Session session = new Session();
+        session.setUsers(new ArrayList<>());
+
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // WHEN
+        sessionService.participate(sessionId, userId);
+
+        // THEN
+        verify(sessionRepository).save(session);
+        assertThat(session.getUsers()).contains(user);
+    }   
+
 
 }
