@@ -144,4 +144,79 @@ class SessionControllerIntegrationTest {
                 .header("Authorization", getAuthorizationHeader()))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void shouldParticipateSuccessfully() throws Exception {
+        Long sessionId = 1L; 
+        Long userToJoin = 3L;
+
+        mockMvc.perform(post("/api/session/{id}/participate/{userId}", sessionId, userToJoin)
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isOk());
+
+        Session updatedSession = sessionRepository.findById(sessionId).orElse(null);
+        assertThat(updatedSession).isNotNull();
+        boolean isParticipant = updatedSession.getUsers().stream()
+        .anyMatch(u -> u.getId().equals(userToJoin));
+        assertThat(isParticipant).isTrue();
+    }
+
+    @Test
+    void shouldReturn404WhenSessionNotFoundInParticipate() throws Exception {
+        mockMvc.perform(post("/api/session/999/participate/2")
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn404WhenUserNotFoundInParticipate() throws Exception {
+        mockMvc.perform(post("/api/session/1/participate/999")
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenAlreadyParticipating() throws Exception {
+        mockMvc.perform(post("/api/session/1/participate/2")
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldNoLongerParticipateSuccessfully() throws Exception {
+        Long sessionId = 2L; 
+        Long userId = 3L;
+
+        mockMvc.perform(delete("/api/session/{id}/participate/{userId}", sessionId, userId)
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isOk());
+
+        Session updatedSession = sessionRepository.findById(sessionId).orElse(null);
+        assertThat(updatedSession).isNotNull();
+        boolean stillParticipant = updatedSession.getUsers().stream()
+        .anyMatch(u -> u.getId().equals(userId));
+        assertThat(stillParticipant).isFalse();
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenSessionDoesNotExistInNoLongerParticipate() throws Exception {
+        mockMvc.perform(delete("/api/session/999/participate/2")
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenUserDoesNotExistInNoLongerParticipate() throws Exception {
+        mockMvc.perform(delete("/api/session/1/participate/3")
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenIdsAreNonNumeric() throws Exception {
+        mockMvc.perform(post("/api/session/abc/participate/abc")
+        .header("Authorization", getAuthorizationHeader()))
+        .andExpect(status().isBadRequest());
+    }
+
 }
