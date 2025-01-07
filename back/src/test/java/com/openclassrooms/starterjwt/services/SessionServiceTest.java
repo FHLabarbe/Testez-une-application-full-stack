@@ -166,7 +166,7 @@ class SessionServiceTest {
         User user = new User();
         user.setId(userId);
         Session session = new Session();
-        session.setUsers(new ArrayList<>(List.of(user)));
+        session.setUsers(Arrays.asList(user));
 
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -176,11 +176,10 @@ class SessionServiceTest {
         verify(sessionRepository, times(1)).findById(sessionId);
         verify(userRepository, times(1)).findById(userId);
         verifyNoMoreInteractions(sessionRepository, userRepository);
-    }   
+    }
 
     @Test
     void shouldAddUserWhenParticipateIsCalledWithValidData() {
-        // GIVEN
         Long sessionId = 10L;
         Long userId = 100L;
         User user = new User();
@@ -191,13 +190,9 @@ class SessionServiceTest {
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // WHEN
         sessionService.participate(sessionId, userId);
 
-        // THEN
         verify(sessionRepository).save(session);
         assertThat(session.getUsers()).contains(user);
     }   
-
-
 }

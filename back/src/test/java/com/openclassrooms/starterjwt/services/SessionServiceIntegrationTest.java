@@ -26,17 +26,13 @@ class SessionServiceIntegrationTest {
 
     @Test
     void testParticipateInSession_Success() {
-        // Vérifier les données initialisées par data.sql
         Session session = sessionRepository.findById(1L).orElseThrow(() -> new AssertionError("Session non trouvée"));
         User user = userRepository.findById(3L).orElseThrow(() -> new AssertionError("Utilisateur non trouvé"));
 
-        // Vérifier que l'utilisateur ne participe pas encore à cette session
         assertFalse(session.getUsers().stream().anyMatch(u -> u.getId().equals(user.getId())));
 
-        // Ajouter l'utilisateur à la session
         sessionService.participate(session.getId(), user.getId());
 
-        // Vérifier que l'utilisateur participe maintenant
         Session updatedSession = sessionRepository.findById(session.getId())
                 .orElseThrow(() -> new AssertionError("Session non trouvée après mise à jour"));
         assertTrue(updatedSession.getUsers().stream().anyMatch(u -> u.getId().equals(user.getId())));

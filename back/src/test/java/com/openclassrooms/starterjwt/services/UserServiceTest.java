@@ -1,7 +1,6 @@
 package com.openclassrooms.starterjwt.services;
 
 import com.openclassrooms.starterjwt.models.User;
-import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
@@ -30,7 +28,6 @@ class UserServiceTest {
 
     @Test
     void shouldReturnUserById() {
-        Long userId = 2L;
         User user = User.builder()
                 .email("john.doe@example.com")
                 .lastName("Doe")
@@ -39,12 +36,12 @@ class UserServiceTest {
                 .admin(false)
                 .build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        User result = userService.findById(userId);
+        User result = userService.findById(1L);
 
         assertThat(result).isEqualTo(user);
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
@@ -54,6 +51,13 @@ class UserServiceTest {
         User result = userService.findById(userId);
         assertThat(result).isNull();
         verify(userRepository, times(1)).findById(userId);
+    }
+
+    @Test
+    void shouldDeleteUserById() {
+        Long userId = 1L;
+        userService.delete(userId);
+        verify(userRepository, times(1)).deleteById(userId);
     }
 
 }
