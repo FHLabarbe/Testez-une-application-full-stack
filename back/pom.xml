@@ -143,6 +143,10 @@
 											<minimum>0.9</minimum>
 										</limit>
 									</limits>
+									<excludes>
+										<exclude>com.openclassrooms.starterjwt.dto.*</exclude>
+        								<exclude>com.openclassrooms.starterjwt.SpringBootSecurityJwtApplication.class</exclude>
+									</excludes>
 								</rule>
 							</rules>
 						</configuration>

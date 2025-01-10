@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.payload.request.LoginRequest;
 import com.openclassrooms.starterjwt.payload.request.SignupRequest;
+import com.openclassrooms.starterjwt.payload.response.MessageResponse;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 
 @SpringBootTest
@@ -47,7 +48,11 @@ class AuthControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.id").exists());
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.username").value("test.user@example.com"))
+                .andExpect(jsonPath("$.firstName").value("Test"))
+                .andExpect(jsonPath("$.lastName").value("User"))
+                .andExpect(jsonPath("$.admin").value(true));
     }
 
     @Test
@@ -106,4 +111,12 @@ class AuthControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void shouldSetAndGetMessage() {
+        MessageResponse mr = new MessageResponse("Hello");
+        mr.setMessage("World");
+        assertThat(mr.getMessage()).isEqualTo("World");
+    }
+
 }
