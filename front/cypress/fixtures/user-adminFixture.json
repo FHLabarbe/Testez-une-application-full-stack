@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "username": "admin@example.com",
+  "firstName": "Admin",
+  "lastName": "Doe",
+  "admin": true,
+  "token": "fake-jwt-token",
+  "type": "Bearer"
+}

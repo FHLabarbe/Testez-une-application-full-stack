@@ -1,7 +1,8 @@
 {
   "id": 1,
-  "firstName": "Jane",
+  "firstName": "John",
   "lastName": "Doe",
-  "createdAt": "2025-01-01T08:00:00Z",
-  "updatedAt": "2025-01-02T08:00:00Z"
+  "email": "john.doe@example.com",
+  "createdAt": "2022-01-01",
+  "updatedAt": "2023-01-01"
 }

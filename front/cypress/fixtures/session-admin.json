@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "name": "Admin Session",
+  "description": "An admin scenario for testing delete",
+  "date": "2025-01-01T10:00:00Z",
+  "teacher_id": 1,
+  "users": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-05T00:00:00Z"
+}

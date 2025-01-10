@@ -3,7 +3,7 @@
   "email": "test@example.com",
   "firstName": "John",
   "lastName": "Doe",
-  "admin": false,
+  "admin": true,
   "token": "fake-jwt-token",
   "createdAt": "01011970",
   "updatedAt": "01011970"
