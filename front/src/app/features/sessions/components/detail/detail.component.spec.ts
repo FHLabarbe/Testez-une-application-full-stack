@@ -1,15 +1,12 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterTestingModule, } from '@angular/router/testing';
-import { expect } from '@jest/globals'; 
+import { expect, jest } from '@jest/globals';
 import { SessionService } from '../../../../services/session.service';
 
 import { DetailComponent } from './detail.component';
-import { SessionApiService } from '../../services/session-api.service';
-import { Router } from '@angular/router';
-import { of } from 'rxjs';
 
 
 describe('DetailComponent', () => {

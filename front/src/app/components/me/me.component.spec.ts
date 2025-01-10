@@ -1,18 +1,13 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { expect,jest } from '@jest/globals';
-import { SessionService } from 'src/app/services/session.service';
-
 import { Router } from '@angular/router';
+import { expect, jest } from '@jest/globals';
+import { of } from 'rxjs';
+
+import { SessionService } from 'src/app/services/session.service';
 import { UserService } from 'src/app/services/user.service';
 import { MeComponent } from './me.component';
-import { User } from 'src/app/interfaces/user.interface';
-import { of } from 'rxjs';
 
 describe('MeComponent', () => {
   let component: MeComponent;
@@ -24,28 +19,50 @@ describe('MeComponent', () => {
   const mockSessionService = {
     sessionInformation: {
       admin: true,
-      id: 1
+      id: 1,
     },
     logOut: jest.fn(),
-  }
-  
+  };
+
   beforeEach(async () => {
+    const mockRouter = {
+      navigate: jest.fn(),
+    };
+
+    const mockMatSnackBar = {
+      open: jest.fn(),
+    };
+
+    const mockUserService = {
+      getById: jest.fn().mockReturnValue(of({
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+        admin: false,
+        password: 'mockPassword',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })),
+      delete: jest.fn().mockReturnValue(of({})),
+    };
+
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
-      imports: [
-        MatSnackBarModule,
-        HttpClientModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatIconModule,
-        MatInputModule
+      imports: [MatSnackBarModule, HttpClientModule],
+      providers: [
+        { provide: SessionService, useValue: mockSessionService },
+        { provide: Router, useValue: mockRouter },
+        { provide: MatSnackBar, useValue: mockMatSnackBar },
+        { provide: UserService, useValue: mockUserService },
       ],
-      providers: [{ provide: SessionService, useValue: mockSessionService }],
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MeComponent);
     component = fixture.componentInstance;
+    userService = TestBed.inject(UserService) as jest.Mocked<UserService>;
+    router = TestBed.inject(Router) as jest.Mocked<Router>;
+    matSnackBar = TestBed.inject(MatSnackBar) as jest.Mocked<MatSnackBar>;
     fixture.detectChanges();
   });
 
@@ -54,48 +71,42 @@ describe('MeComponent', () => {
   });
 
   it('should fetch user information on init', () => {
-    const mockUser: User = {
-    id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    admin: false,
-    password: 'mockPassword',
-    createdAt: new Date('2024-12-19'),
-    updatedAt: new Date('2024-12-20'),
-  };
-    const getByIdSpy = jest.spyOn(component['userService'], 'getById').mockReturnValue(of(mockUser));
     component.ngOnInit();
-    expect(getByIdSpy).toHaveBeenCalledWith(mockSessionService.sessionInformation.id.toString());
-    expect(component.user).toEqual(mockUser);
-  });
-
-  it('should call back method when back button is clicked', () => {
-    const backSpy = jest.spyOn(component, 'back');
-    const backButton = fixture.nativeElement.querySelector('button[mat-icon-button]');
-    backButton.click();
-    expect(backSpy).toHaveBeenCalled();
-  });
-
-  it('should call delete method when delete button is clicked', () => {
-    component.user = {
+    expect(userService.getById).toHaveBeenCalledWith(mockSessionService.sessionInformation.id.toString());
+    expect(component.user).toEqual({
       id: 1,
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@example.com',
       admin: false,
       password: 'mockPassword',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    fixture.detectChanges();
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+    });
+  });
+
+  it('should call back method when back button is clicked', () => {
+    const backSpy = jest.spyOn(component, 'back');
+    component.back();
+    expect(backSpy).toHaveBeenCalled();
+  });
+
+  it('should delete user account and display snackbar message', () => {
+    component.delete();
+    expect(userService.delete).toHaveBeenCalledWith(mockSessionService.sessionInformation.id.toString());
+    expect(matSnackBar.open).toHaveBeenCalledWith(
+      'Your account has been deleted !',
+      'Close',
+      { duration: 3000 }
+    );
+    expect(mockSessionService.logOut).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should call delete method when delete button is clicked', () => {
     const deleteSpy = jest.spyOn(component, 'delete');
     const deleteButton = fixture.nativeElement.querySelector('button[mat-raised-button]');
     deleteButton.click();
     expect(deleteSpy).toHaveBeenCalled();
-});
-
-
-
-
+  });
 });
