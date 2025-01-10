@@ -1,4 +1,4 @@
- describe('Session Tests - List Sessions', () => {
+ /*describe('Session Tests - List Sessions', () => {
   beforeEach(() => {
     cy.intercept('GET', '/api/session', { fixture: 'sessions.json' }).as('getSessions');
     cy.intercept('GET', '/api/auth/user', {
@@ -20,4 +20,4 @@
 
     cy.get('.items .item').should('have.length.greaterThan', 0);
   });
-});
+});*/

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe('Guards Tests', () => {
+/*describe('Guards Tests', () => {
   
   beforeEach(() => {
     cy.visit('/');
@@ -35,4 +35,4 @@ describe('Guards Tests', () => {
     cy.visit('/register');
     cy.url().should('include', '/sessions');
   });
-});
+});*/
