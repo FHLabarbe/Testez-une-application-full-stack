@@ -10,6 +10,7 @@
     "e2e": "ng e2e",
     "e2e:ci": "ng run yoga:e2e-ci",
     "e2e:coverage": "npx nyc report --reporter=lcov --reporter=text-summary",
+    "e2e:all": "ng run yoga:serve-coverage & wait-on http://localhost:4200 && cypress run --headless && nyc report --reporter=lcov --reporter=text-summary",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },
